@@ -1,13 +1,43 @@
+# Environment
 venv/
-__pycache__/
-*.pyc
-.env
+.venv/
+env/
+.env/
+
+# Dependencies
+node_modules/
+jspm_packages/
+typings/
+
+# Dataset and Models (Large Files)
+soil_dataset/
+models/*.h5
+models/*.pkl
+dtd/
+dtd-r1.0.1.tar.gz
+
+# Uploads and Temp
 uploads/
+temp_*/
+
+# IDE and Editor
+.vscode/
+.idea/
+.DS_Store
+*.swp
+*.swo
+
+# Build/Diagnostics
+dist/
+build/
+coverage/
+*.log
+pyright_out.txt
+flake8_out.txt
 test_out.txt
 test_results.json
-models/
-soil_dataset/
-frontend/node_modules/
-frontend/dist/
-frontend/.env.local
-.vscode/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
