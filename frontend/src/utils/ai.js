@@ -50,7 +50,7 @@ async function preprocessImage(imageSource, size = 224) {
     return new ort.Tensor('float32', float32Data, [1, size, size, 3]);
 }
 
-// Color heuristic logic from Python ported to JS
+// Color heuristic logic - simplified to avoid rejecting valid black soil
 function isLikelySoil(imageData, width, height) {
     let rSum = 0, gSum = 0, bSum = 0;
     const pixels = width * height;
@@ -65,39 +65,41 @@ function isLikelySoil(imageData, width, height) {
     const gMean = gSum / pixels;
     const bMean = bSum / pixels;
     const brightness = (rMean + gMean + bMean) / 3.0;
-    const maxDiff = Math.max(Math.abs(rMean - gMean), Math.abs(rMean - bMean), Math.abs(gMean - bMean));
-    const isGray = maxDiff < 0.06;
-
-    if (isGray && brightness > 0.10 && brightness < 0.75) {
-        return { likely: false, reason: "This appears to be a road, pavement, or structure. Please upload a clear photo of farming soil." };
+    
+    // Only reject extremely green (grass) or extremely bright (sky/blank)
+    if (gMean > rMean + 0.15 && gMean > bMean) {
+        return { likely: false, reason: "This appears to be mostly vegetation or grass. Please upload a clear picture of the soil." };
     }
-    if (gMean > rMean + 0.01 && gMean > bMean) {
-        return { likely: false, reason: "This appears to be mostly vegetation or grass. Please upload a picture of the raw soil." };
-    }
-    if (brightness > 0.88) {
-        return { likely: false, reason: "This image appears too bright or washed out. Please upload a clear picture of farming soil." };
+    if (brightness > 0.95) {
+        return { likely: false, reason: "This image is too bright or white. Please upload a clear picture of farming soil." };
     }
 
     return { likely: true };
 }
 
 export async function predictSoil(imageFile) {
+    let session = null;
     try {
         const tensor = await preprocessImage(imageFile);
         
-        // Run heuristic check
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
+        // Run heuristic check on a sample
         const img = await createImageBitmap(imageFile);
-        canvas.width = 100; // small sample
+        const canvas = document.createElement('canvas');
+        canvas.width = 100;
         canvas.height = 100;
+        const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, 100, 100);
         const check = isLikelySoil(ctx.getImageData(0, 0, 100, 100), 100, 100);
+        
         if (!check.likely) throw new Error(check.reason);
 
-        const session = await ort.InferenceSession.create('/models/soil_model.onnx');
-        const results = await session.run({ [session.inputNames[0]]: tensor });
-        const output = results[session.outputNames[0]].data;
+        // Load model
+        session = await ort.InferenceSession.create('/models/soil_model.onnx', { executionProviders: ['wasm'] });
+        
+        const inputName = session.inputNames[0];
+        const outputName = session.outputNames[0];
+        const results = await session.run({ [inputName]: tensor });
+        const output = results[outputName].data;
         
         let maxIdx = 0;
         let maxVal = -1;
@@ -110,9 +112,15 @@ export async function predictSoil(imageFile) {
 
         const result = { ...SOIL_DB[maxIdx] };
         result.confidence = Math.round(maxVal * 100 * 100) / 100;
+        
+        // Final safeguard for "Black soil" - if the model says Chalky(0) but the image is very dark, 
+        // we might want to guide the user. But black soil is usually Peaty or Loamy.
+        // For now, let's trust the model since it was trained on real photos.
+        
         return result;
     } catch (e) {
-        throw new Error(e.message || "Soil analysis failed.");
+        console.error("AI Analysis Error:", e);
+        throw new Error(e.message || "Model failed to analyze image. Please refresh and try again.");
     }
 }
 
