@@ -42,7 +42,7 @@ const DiseaseDetection = () => {
         formData.append('file', selectedFile);
 
         try {
-            const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+            const baseUrl = import.meta.env.VITE_API_URL || '';
             const response = await axios.post(`${baseUrl}/api/predict_disease`, formData);
             setResult(response.data);
         } catch {

@@ -7,7 +7,7 @@ import tensorflow as tf  # type: ignore
 from PIL import Image  # type: ignore
 
 app = Flask(__name__)
-CORS(app)  # Enable Cross-Origin Resource Sharing for the React Frontend
+CORS(app, resources={r"/api/*": {"origins": "*"}})  # Enable CORS for all API routes manually
 app.config['UPLOAD_FOLDER'] = 'uploads'
 
 # Ensure upload folder exists

@@ -49,7 +49,7 @@ const CropRecommendation = () => {
         formData.append('file', selectedFile);
 
         try {
-            const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+            const baseUrl = import.meta.env.VITE_API_URL || ''; // Empty string uses local proxy in development
             const response = await axios.post(`${baseUrl}/api/predict_crop`, formData);
             setResult(response.data);
         } catch (err) {
