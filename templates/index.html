@@ -1,0 +1,99 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="dashboard-header animate-fade-in">
+    <div>
+        <h1 class="page-title">Welcome to AgriVision</h1>
+        <p class="page-subtitle">Harness the power of AI to optimize your farming yield.</p>
+    </div>
+    <div class="date-widget">
+        <i class="fa-regular fa-calendar"></i>
+        <span id="current-date">Today</span>
+    </div>
+</div>
+
+<div class="dashboard-grid animate-slide-up">
+    <!-- Feature Card 1 -->
+    <a href="{{ url_for('crop') }}" class="feature-card">
+        <div class="card-icon bg-green-light">
+            <i class="fa-solid fa-seedling text-green"></i>
+        </div>
+        <div class="card-content">
+            <h3>Crop Recommender</h3>
+            <p>Find the best crop to plant based on your soil nutrients and local climate data.</p>
+        </div>
+        <div class="card-arrow">
+            <i class="fa-solid fa-arrow-right"></i>
+        </div>
+    </a>
+
+    <!-- Feature Card 2 -->
+    <a href="{{ url_for('fertilizer') }}" class="feature-card">
+        <div class="card-icon bg-blue-light">
+            <i class="fa-solid fa-flask text-blue"></i>
+        </div>
+        <div class="card-content">
+            <h3>Fertilizer Calculator</h3>
+            <p>Get accurate fertilizer recommendations to maintain soil health and maximize yield.</p>
+        </div>
+        <div class="card-arrow">
+            <i class="fa-solid fa-arrow-right"></i>
+        </div>
+    </a>
+
+    <!-- Feature Card 3 -->
+    <a href="{{ url_for('disease') }}" class="feature-card">
+        <div class="card-icon bg-red-light">
+            <i class="fa-solid fa-microscope text-red"></i>
+        </div>
+        <div class="card-content">
+            <h3>Disease Detection</h3>
+            <p>Upload a photo of a sick plant leaf to instantly identify diseases and get treatment advice.</p>
+        </div>
+        <div class="card-arrow">
+            <i class="fa-solid fa-arrow-right"></i>
+        </div>
+    </a>
+</div>
+
+<div class="stats-overview animate-fade-in-delayed">
+    <div class="section-title">
+        <h2>Farming Insights</h2>
+    </div>
+    <div class="stats-grid">
+        <div class="stat-card glass-panel">
+            <div class="stat-header">
+                <i class="fa-solid fa-cloud-sun"></i>
+                <span>Local Weather</span>
+            </div>
+            <div class="stat-value">24°C</div>
+            <div class="stat-desc">Partly Cloudy, 65% Humidity</div>
+        </div>
+        <div class="stat-card glass-panel">
+            <div class="stat-header">
+                <i class="fa-solid fa-droplet"></i>
+                <span>Soil Moisture</span>
+            </div>
+            <div class="stat-value">Optimal</div>
+            <div class="stat-desc">Last checked: 2 hours ago</div>
+        </div>
+        <div class="stat-card glass-panel">
+            <div class="stat-header">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Predicted Yield</span>
+            </div>
+            <div class="stat-value">+15%</div>
+            <div class="stat-desc">Compared to last season</div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-US', dateOptions);
+    });
+</script>
+{% endblock %}

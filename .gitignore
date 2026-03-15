@@ -1,0 +1,13 @@
+venv/
+__pycache__/
+*.pyc
+.env
+uploads/
+test_out.txt
+test_results.json
+models/
+soil_dataset/
+frontend/node_modules/
+frontend/dist/
+frontend/.env.local
+.vscode/

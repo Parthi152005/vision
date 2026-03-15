@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgriVision | Smart Agriculture AI</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fa-solid fa-leaf"></i>
+                    <span>AgriVision</span>
+                </div>
+            </div>
+            <ul class="nav-links">
+                <li>
+                    <a href="{{ url_for('index') }}" class="{% if request.endpoint == 'index' %}active{% endif %}">
+                        <i class="fa-solid fa-house"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('crop') }}" class="{% if request.endpoint == 'crop' %}active{% endif %}">
+                        <i class="fa-solid fa-seedling"></i>
+                        <span>Crop Recommender</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('fertilizer') }}" class="{% if request.endpoint == 'fertilizer' %}active{% endif %}">
+                        <i class="fa-solid fa-flask"></i>
+                        <span>Fertilizer Calculator</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('disease') }}" class="{% if request.endpoint == 'disease' %}active{% endif %}">
+                        <i class="fa-solid fa-microscope"></i>
+                        <span>Disease Detection</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <p>AI Powered Farming</p>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <header class="topbar">
+                <div class="search-bar">
+                    <i class="fa-solid fa-search"></i>
+                    <input type="text" placeholder="Search insights...">
+                </div>
+                <div class="user-profile">
+                    <div class="notification-icon">
+                        <i class="fa-regular fa-bell"></i>
+                        <span class="badge"></span>
+                    </div>
+                    <img src="https://ui-avatars.com/api/?name=Farmer&background=0D8B4D&color=fff" alt="User" class="avatar">
+                </div>
+            </header>
+
+            <div class="content-body">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

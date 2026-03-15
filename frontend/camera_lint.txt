@@ -1,0 +1,63 @@
+﻿
+D:\agriculture\frontend\src\components\CameraCapture.jsx
+  11:5   error    Error: Cannot access variable before it is declared
+
+`startCamera` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+   9 |
+  10 |   useEffect(() => {
+> 11 |     startCamera();
+     |     ^^^^^^^^^^^ `startCamera` accessed before it is declared
+  12 |     return () => stopCamera();
+  13 |   }, []);
+  14 |
+
+  13 |   }, []);
+  14 |
+> 15 |   const startCamera = async () => {
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 16 |     setError(null);
+     | ^^^^^^^^^^^^^^^^^^^
+> 17 |     try {
+     ΓÇª
+     | ^^^^^^^^^^^^^^^^^^^
+> 28 |     }
+     | ^^^^^^^^^^^^^^^^^^^
+> 29 |   };
+     | ^^^^^ `startCamera` is declared here
+  30 |
+  31 |   const stopCamera = () => {
+  32 |     if (stream) {                                                                                                                                                    react-hooks/immutability
+  12:18  error    Error: Cannot access variable before it is declared
+
+`stopCamera` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+  10 |   useEffect(() => {
+  11 |     startCamera();
+> 12 |     return () => stopCamera();
+     |                  ^^^^^^^^^^ `stopCamera` accessed before it is declared
+  13 |   }, []);
+  14 |
+  15 |   const startCamera = async () => {
+
+  29 |   };
+  30 |
+> 31 |   const stopCamera = () => {
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 32 |     if (stream) {
+     | ^^^^^^^^^^^^^^^^^
+> 33 |       stream.getTracks().forEach(track => track.stop());
+     | ^^^^^^^^^^^^^^^^^
+> 34 |       setStream(null);
+     | ^^^^^^^^^^^^^^^^^
+> 35 |     }
+     | ^^^^^^^^^^^^^^^^^
+> 36 |   };
+     | ^^^^^ `stopCamera` is declared here
+  37 |
+  38 |   const captureFrame = () => {
+  39 |     if (videoRef.current && canvasRef.current) {  react-hooks/immutability
+  13:6   warning  React Hook useEffect has a missing dependency: 'stopCamera'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          react-hooks/exhaustive-deps
+
+Γ£û 3 problems (2 errors, 1 warning)
+

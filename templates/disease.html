@@ -1,0 +1,58 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="page-header animate-fade-in">
+    <h2><i class="fa-solid fa-microscope text-red"></i> Plant Disease Detection</h2>
+    <p>Upload a clear photo of a plant leaf to detect potential diseases and receive treatment advice.</p>
+</div>
+
+<div class="content-wrapper animate-slide-up">
+    <div class="form-container glass-panel">
+        <form id="disease-form" class="ai-form" enctype="multipart/form-data">
+            <div class="upload-zone" id="upload-zone">
+                <input type="file" id="file-input" name="file" accept="image/png, image/jpeg, image/jpg" class="hidden-input" required>
+                <div class="upload-content">
+                    <div class="upload-icon">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                    </div>
+                    <h3>Drag & Drop your image here</h3>
+                    <p>or click to browse from your device</p>
+                    <span class="file-hint">Supports: JPG, PNG (Max 5MB)</span>
+                </div>
+                
+                <!-- Preview Image -->
+                <div id="image-preview-container" class="hidden">
+                    <img id="image-preview" src="#" alt="Leaf Preview">
+                    <button type="button" class="btn-icon" id="remove-image">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="form-actions centered">
+                <button type="submit" class="btn-primary btn-red" id="disease-submit-btn" disabled>
+                    <span>Analyze Leaf Image</span>
+                    <i class="fa-solid fa-microscope"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Result Banner -->
+    <div id="disease-result" class="disease-result-card hidden">
+        <div class="disease-header">
+            <div class="result-icon-large">
+                <i class="fa-solid fa-virus"></i>
+            </div>
+            <div class="disease-title">
+                <h3>Detection Result</h3>
+                <h2 id="disease-name" class="highlight-text-red">Loading...</h2>
+            </div>
+        </div>
+        <div class="disease-body">
+            <h4>Recommended Treatment:</h4>
+            <p id="treatment-advice">Analyzing data...</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

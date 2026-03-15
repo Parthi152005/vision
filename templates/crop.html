@@ -1,0 +1,61 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="page-header animate-fade-in">
+    <h2><i class="fa-solid fa-seedling text-green"></i> Crop Recommender</h2>
+    <p>Upload a picture of your soil to use AI for soil classification and crop recommendations.</p>
+</div>
+
+<div class="content-wrapper animate-slide-up">
+    <div class="form-container glass-panel">
+        <form id="crop-form" class="ai-form" enctype="multipart/form-data">
+            <div class="upload-zone" id="crop-upload-zone">
+                <input type="file" id="crop-file-input" name="file" accept="image/png, image/jpeg, image/jpg" class="hidden-input" required>
+                <div class="upload-content">
+                    <div class="upload-icon">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                    </div>
+                    <h3>Drag & Drop soil image here</h3>
+                    <p>or click to browse from your device</p>
+                    <span class="file-hint">Supports: JPG, PNG (Max 5MB)</span>
+                </div>
+                
+                <!-- Preview Image -->
+                <div id="crop-image-preview-container" class="hidden">
+                    <img id="crop-image-preview" src="#" alt="Soil Preview">
+                    <button type="button" class="btn-icon" id="crop-remove-image">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="form-actions centered">
+                <button type="submit" class="btn-primary" id="crop-submit-btn" disabled>
+                    <span>Analyze Soil</span>
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Result Banner -->
+    <div id="crop-result" class="disease-result-card hidden">
+        <div class="disease-header" style="background: linear-gradient(135deg, #d1fae5, #a7f3d0);">
+            <div class="result-icon-large" style="color: var(--primary-green);">
+                <i class="fa-solid fa-earth-americas"></i>
+            </div>
+            <div class="disease-title">
+                <h3 style="color: var(--primary-green-dark);">Detected Soil Type</h3>
+                <h2 id="soil-type-name" class="highlight-text">Loading...</h2>
+            </div>
+        </div>
+        <div class="disease-body">
+            <h4 style="margin-top: 10px;">Recommended Crops:</h4>
+            <p id="crop-recommendations" style="font-weight: 500; font-size: 18px; color: var(--primary-green-dark); margin-bottom: 20px;">Analyzing data...</p>
+            
+            <h4>Farming Suggestion:</h4>
+            <p id="farming-suggestion">Analyzing data...</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
