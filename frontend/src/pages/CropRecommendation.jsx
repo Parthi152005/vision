@@ -49,8 +49,8 @@ const CropRecommendation = () => {
         formData.append('file', selectedFile);
 
         try {
-            // Note: Update Base URL if Flask is not on localhost:5000
-            const response = await axios.post('http://localhost:5000/api/predict_crop', formData);
+            const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+            const response = await axios.post(`${baseUrl}/api/predict_crop`, formData);
             setResult(response.data);
         } catch (err) {
             setError(err.response?.data?.error || "Analysis failed. Please try again.");

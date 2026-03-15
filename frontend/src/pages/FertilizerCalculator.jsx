@@ -23,7 +23,8 @@ const FertilizerCalculator = () => {
         setError(null);
 
         try {
-            const response = await axios.post('http://localhost:5000/api/predict_fertilizer', formData);
+            const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+            const response = await axios.post(`${baseUrl}/api/predict_fertilizer`, formData);
             setResult(response.data.prediction);
         } catch {
             setError("Analysis failed. Please try again.");

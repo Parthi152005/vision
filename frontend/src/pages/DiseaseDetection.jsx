@@ -42,7 +42,8 @@ const DiseaseDetection = () => {
         formData.append('file', selectedFile);
 
         try {
-            const response = await axios.post('http://localhost:5000/api/predict_disease', formData);
+            const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+            const response = await axios.post(`${baseUrl}/api/predict_disease`, formData);
             setResult(response.data);
         } catch {
             setError("Detection failed. Please try a clearer leaf image.");
