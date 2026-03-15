@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import axios from 'axios';
+import { predictFertilizer } from '../utils/ai';
 import { Flask, CaretRight, CheckCircle, WarningCircle } from '@phosphor-icons/react';
 
 const FertilizerCalculator = () => {
@@ -23,9 +23,8 @@ const FertilizerCalculator = () => {
         setError(null);
 
         try {
-            const baseUrl = import.meta.env.VITE_API_URL || '';
-            const response = await axios.post(`${baseUrl}/api/predict_fertilizer`, formData);
-            setResult(response.data.prediction);
+            const prediction = predictFertilizer(formData);
+            setResult(prediction);
         } catch {
             setError("Analysis failed. Please try again.");
         } finally {

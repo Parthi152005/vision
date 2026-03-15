@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import axios from 'axios';
+import { predictDisease } from '../utils/ai';
 import { Bug, Image as ImageIcon, Sparkle, X, WarningCircle, ShieldCheck, Camera } from '@phosphor-icons/react';
 import CameraCapture from '../components/CameraCapture';
 
@@ -42,11 +42,10 @@ const DiseaseDetection = () => {
         formData.append('file', selectedFile);
 
         try {
-            const baseUrl = import.meta.env.VITE_API_URL || '';
-            const response = await axios.post(`${baseUrl}/api/predict_disease`, formData);
-            setResult(response.data);
-        } catch {
-            setError("Detection failed. Please try a clearer leaf image.");
+            const data = await predictDisease(selectedFile);
+            setResult(data);
+        } catch (err) {
+            setError(err.message || "Detection failed. Please try a clearer leaf image.");
         } finally {
             setLoading(false);
         }

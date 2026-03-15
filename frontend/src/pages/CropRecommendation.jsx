@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import axios from 'axios';
+import { predictSoil } from '../utils/ai';
 import CameraCapture from '../components/CameraCapture';
 import { Plant, UploadSimple, X, Sparkle, WarningCircle, CheckCircle, Globe, Camera } from '@phosphor-icons/react';
 
@@ -49,11 +49,10 @@ const CropRecommendation = () => {
         formData.append('file', selectedFile);
 
         try {
-            const baseUrl = import.meta.env.VITE_API_URL || ''; // Empty string uses local proxy in development
-            const response = await axios.post(`${baseUrl}/api/predict_crop`, formData);
-            setResult(response.data);
+            const data = await predictSoil(selectedFile);
+            setResult(data);
         } catch (err) {
-            setError(err.response?.data?.error || "Analysis failed. Please try again.");
+            setError(err.message || "Analysis failed. Please try again.");
         } finally {
             setLoading(false);
         }
