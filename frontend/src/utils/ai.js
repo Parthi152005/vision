@@ -56,7 +56,7 @@ function isLikelySoil(imageData, width, height) {
     let rSum = 0, gSum = 0, bSum = 0;
     const pixels = width * height;
 
-    // Also compute top-third and bottom-third stats for landscape detection
+    // Compute top-third and bottom-third stats for landscape detection
     const thirdH = Math.floor(height / 3);
     let topR = 0, topG = 0, topB = 0, topPixels = 0;
     let botR = 0, botG = 0, botB = 0, botPixels = 0;
@@ -82,17 +82,24 @@ function isLikelySoil(imageData, width, height) {
     const isGray = maxDiff < 0.06;
 
     // 1. Roads / asphalt / concrete (Gray/Neutral, mid-brightness)
-    //    Black soil is very dark (brightness < 0.25), roads are mid-range gray.
     if (isGray && brightness > 0.25 && brightness < 0.75) {
         return { likely: false, reason: "This appears to be a road, pavement, or structure. Please upload a close-up photo of farming soil." };
     }
 
-    // 2. Vegetation / Grass / Trees (Green dominant)
-    if (gMean > rMean + 0.08 && gMean > bMean + 0.03) {
+    // 2. Vegetation / Grass / Trees (Green dominant overall)
+    if (gMean > rMean + 0.05 && gMean > bMean + 0.03) {
         return { likely: false, reason: "This appears to be mostly vegetation or grass. Please upload a picture of the raw soil." };
     }
 
-    // 3. Sky / Water (Blue dominant in the top third)
+    // 2b. Bottom-third vegetation (catches landscapes where the ground is green grass)
+    if (botPixels > 0) {
+        const bR = botR / botPixels, bG = botG / botPixels, bB = botB / botPixels;
+        if (bG > bR + 0.05 && bG > bB + 0.03) {
+            return { likely: false, reason: "The bottom of this image appears to be grass or vegetation. Please upload a close-up of bare soil." };
+        }
+    }
+
+    // 3. Sky (Blue dominant in the top third)
     if (topPixels > 0) {
         const tR = topR / topPixels, tG = topG / topPixels, tB = topB / topPixels;
         if (tB > tR + 0.05 && tB > tG + 0.02) {
@@ -100,11 +107,26 @@ function isLikelySoil(imageData, width, height) {
         }
     }
 
-    // 4. Bright sky over dark land (landscape pattern)
+    // 3b. Sunset / warm sky (orange/red/yellow dominant in top third)
+    if (topPixels > 0) {
+        const tR = topR / topPixels, tG = topG / topPixels, tB = topB / topPixels;
+        const topBright = (tR + tG + tB) / 3.0;
+        // Warm sky: red is dominant and top is brighter than bottom
+        if (tR > tG + 0.05 && tR > tB + 0.10 && topBright > 0.4) {
+            if (botPixels > 0) {
+                const botBright = (botR + botG + botB) / (3 * botPixels);
+                if (topBright > botBright + 0.10) {
+                    return { likely: false, reason: "This appears to be a sunset or landscape photo. Please upload a close-up of the soil." };
+                }
+            }
+        }
+    }
+
+    // 4. Large brightness difference between top and bottom (landscape pattern)
     if (topPixels > 0 && botPixels > 0) {
         const topBright = (topR + topG + topB) / (3 * topPixels);
         const botBright = (botR + botG + botB) / (3 * botPixels);
-        if (topBright > botBright + 0.30) {
+        if (Math.abs(topBright - botBright) > 0.25) {
             return { likely: false, reason: "This appears to be a landscape photo. Please upload a close-up of the soil." };
         }
     }
