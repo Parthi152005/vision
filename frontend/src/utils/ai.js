@@ -1,5 +1,8 @@
 import * as ort from 'onnxruntime-web';
 
+// Use single-threaded WASM to avoid needing SharedArrayBuffer headers & .mjs worker files
+ort.env.wasm.numThreads = 1;
+ort.env.wasm.simd = true;
 
 // Database mappings from the original Python backend
 const SOIL_DB = {
@@ -144,14 +147,14 @@ export async function predictSoil(imageFile) {
     try {
         const tensor = await preprocessImage(imageFile);
         
-        // Run heuristic check on a sample
+        // Run heuristic check on a full-resolution sample
         const img = await createImageBitmap(imageFile);
         const canvas = document.createElement('canvas');
-        canvas.width = 100;
-        canvas.height = 100;
+        canvas.width = 224;
+        canvas.height = 224;
         const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, 100, 100);
-        const check = isLikelySoil(ctx.getImageData(0, 0, 100, 100), 100, 100);
+        ctx.drawImage(img, 0, 0, 224, 224);
+        const check = isLikelySoil(ctx.getImageData(0, 0, 224, 224), 224, 224);
         
         if (!check.likely) throw new Error(check.reason);
 

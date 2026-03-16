@@ -40,11 +40,11 @@ export default defineConfig({
     viteStaticCopy({
       targets: [
         {
-          src: 'node_modules/onnxruntime-web/dist/*.wasm',
+          src: 'node_modules/onnxruntime-web/dist/ort-wasm*.wasm',
           dest: '.'
         },
         {
-          src: 'node_modules/onnxruntime-web/dist/*.mjs',
+          src: 'node_modules/onnxruntime-web/dist/ort-wasm*.mjs',
           dest: '.'
         }
       ]
@@ -57,9 +57,14 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
       }
+    },
+    headers: {
+      'Cross-Origin-Embedder-Policy': 'require-corp',
+      'Cross-Origin-Opener-Policy': 'same-origin'
     }
   },
   optimizeDeps: {
     exclude: ['onnxruntime-web']
-  }
+  },
+  assetsInclude: ['**/*.wasm']
 });
