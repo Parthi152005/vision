@@ -1,7 +1,5 @@
 import * as ort from 'onnxruntime-web';
 
-// Configure ONNX Runtime to find the WASM binaries in the public folder
-ort.env.wasm.wasmPaths = '/';
 
 // Database mappings from the original Python backend
 const SOIL_DB = {
