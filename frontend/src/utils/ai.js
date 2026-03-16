@@ -51,27 +51,66 @@ async function preprocessImage(imageSource, size = 224) {
     return new ort.Tensor('float32', float32Data, [1, size, size, 3]);
 }
 
-// Color heuristic logic - simplified to avoid rejecting valid black soil
+// Color heuristic logic - balanced to reject roads/landscapes but accept dark soils
 function isLikelySoil(imageData, width, height) {
     let rSum = 0, gSum = 0, bSum = 0;
     const pixels = width * height;
 
-    for (let i = 0; i < pixels; i++) {
-        rSum += imageData.data[i * 4 + 0] / 255.0;
-        gSum += imageData.data[i * 4 + 1] / 255.0;
-        bSum += imageData.data[i * 4 + 2] / 255.0;
+    // Also compute top-third and bottom-third stats for landscape detection
+    const thirdH = Math.floor(height / 3);
+    let topR = 0, topG = 0, topB = 0, topPixels = 0;
+    let botR = 0, botG = 0, botB = 0, botPixels = 0;
+
+    for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+            const i = y * width + x;
+            const r = imageData.data[i * 4 + 0] / 255.0;
+            const g = imageData.data[i * 4 + 1] / 255.0;
+            const b = imageData.data[i * 4 + 2] / 255.0;
+            rSum += r; gSum += g; bSum += b;
+
+            if (y < thirdH) { topR += r; topG += g; topB += b; topPixels++; }
+            if (y >= height - thirdH) { botR += r; botG += g; botB += b; botPixels++; }
+        }
     }
 
     const rMean = rSum / pixels;
     const gMean = gSum / pixels;
     const bMean = bSum / pixels;
     const brightness = (rMean + gMean + bMean) / 3.0;
-    
-    // Only reject extremely green (grass) or extremely bright (sky/blank)
-    if (gMean > rMean + 0.15 && gMean > bMean) {
-        return { likely: false, reason: "This appears to be mostly vegetation or grass. Please upload a clear picture of the soil." };
+    const maxDiff = Math.max(Math.abs(rMean - gMean), Math.abs(rMean - bMean), Math.abs(gMean - bMean));
+    const isGray = maxDiff < 0.06;
+
+    // 1. Roads / asphalt / concrete (Gray/Neutral, mid-brightness)
+    //    Black soil is very dark (brightness < 0.25), roads are mid-range gray.
+    if (isGray && brightness > 0.25 && brightness < 0.75) {
+        return { likely: false, reason: "This appears to be a road, pavement, or structure. Please upload a close-up photo of farming soil." };
     }
-    if (brightness > 0.95) {
+
+    // 2. Vegetation / Grass / Trees (Green dominant)
+    if (gMean > rMean + 0.08 && gMean > bMean + 0.03) {
+        return { likely: false, reason: "This appears to be mostly vegetation or grass. Please upload a picture of the raw soil." };
+    }
+
+    // 3. Sky / Water (Blue dominant in the top third)
+    if (topPixels > 0) {
+        const tR = topR / topPixels, tG = topG / topPixels, tB = topB / topPixels;
+        if (tB > tR + 0.05 && tB > tG + 0.02) {
+            return { likely: false, reason: "This appears to be a landscape with sky. Please upload a close-up photo of the soil surface." };
+        }
+    }
+
+    // 4. Bright sky over dark land (landscape pattern)
+    if (topPixels > 0 && botPixels > 0) {
+        const topBright = (topR + topG + topB) / (3 * topPixels);
+        const botBright = (botR + botG + botB) / (3 * botPixels);
+        if (topBright > botBright + 0.30) {
+            return { likely: false, reason: "This appears to be a landscape photo. Please upload a close-up of the soil." };
+        }
+    }
+
+    // 5. Very bright / washed-out
+    if (brightness > 0.88) {
         return { likely: false, reason: "This image is too bright or white. Please upload a clear picture of farming soil." };
     }
 
