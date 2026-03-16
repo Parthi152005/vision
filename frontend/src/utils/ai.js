@@ -1,5 +1,8 @@
 import * as ort from 'onnxruntime-web';
 
+// Configure ONNX Runtime to find the WASM binaries in the public folder
+ort.env.wasm.wasmPaths = '/';
+
 // Database mappings from the original Python backend
 const SOIL_DB = {
     0: { soil_type: "Chalky Soil", recommended_crops: "Barley, Spinach, Beetroot, Cabbage", suggestion: "Chalky soil is alkaline and free-draining. Add organic matter to lower pH and improve nutrient retention." },
