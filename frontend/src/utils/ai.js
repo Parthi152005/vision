@@ -133,7 +133,34 @@ function isLikelySoil(imageData, width, height) {
         }
     }
 
-    // 5. Very bright / washed-out
+    // 5. High Saturation / "Cartoon" or Object pattern
+    // Natural soil is brown, gray, black, or dark red (low saturation, low max color variance).
+    // Cartoons, toys, or vibrant objects have highly saturated colors (pure reds, blues, yellows).
+    // We check if a significant portion of pixels have a very high difference between their max and min RGB values.
+    let saturatedPixels = 0;
+    for (let y = 0; y < height; y += 4) { // sample every 4th pixel for speed
+        for (let x = 0; x < width; x += 4) {
+            const i = y * width + x;
+            const r = imageData.data[i * 4 + 0] / 255.0;
+            const g = imageData.data[i * 4 + 1] / 255.0;
+            const b = imageData.data[i * 4 + 2] / 255.0;
+            const maxC = Math.max(r, g, b);
+            const minC = Math.min(r, g, b);
+            const saturation = maxC === 0 ? 0 : (maxC - minC) / maxC;
+            
+            // If pixel is both somewhat bright and highly saturated (e.g. bright blue, bright red)
+            if (maxC > 0.3 && saturation > 0.6) {
+                saturatedPixels++;
+            }
+        }
+    }
+    const saturatedRatio = saturatedPixels / ((width / 4) * (height / 4));
+    // If more than 5% of the image is highly saturated vibrant color, it's not dirt.
+    if (saturatedRatio > 0.05) {
+        return { likely: false, reason: "This image contains highly saturated colors typical of objects or cartoons. Please upload a picture of natural soil." };
+    }
+
+    // 6. Very bright / washed-out
     if (brightness > 0.88) {
         return { likely: false, reason: "This image is too bright or white. Please upload a clear picture of farming soil." };
     }
